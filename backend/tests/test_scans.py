@@ -59,7 +59,7 @@ def test_submit_scan_without_authorization_rejected():
     # Attempt to create scan with authorized=False
     resp = client.post(
         "/scans",
-        json={"target": "https://unauthorized-target.com", "target_type": "url", "authorized": False},
+        json={"target": "https://example.com", "target_type": "url", "authorized": False},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -82,18 +82,18 @@ def test_submit_scan_with_authorization_success():
     # Submit scan with authorized=True
     resp = client.post(
         "/scans",
-        json={"target": "https://authorized-target.com", "target_type": "url", "authorized": True},
+        json={"target": "https://example.com", "target_type": "url", "authorized": True},
         headers={"Authorization": f"Bearer {token}"}
     )
 
     assert resp.status_code == 201
     scan_data = resp.json()
-    assert scan_data["target"] == "https://authorized-target.com"
+    assert scan_data["target"] == "https://example.com"
     assert scan_data["target_type"] == "url"
 
     # Verify consent_log entry WAS created
     db = TestingSessionLocal()
-    consent_entry = db.query(ConsentLog).filter(ConsentLog.target == "https://authorized-target.com").first()
+    consent_entry = db.query(ConsentLog).filter(ConsentLog.target == "https://example.com").first()
     assert consent_entry is not None
     assert consent_entry.target_type == "url"
 

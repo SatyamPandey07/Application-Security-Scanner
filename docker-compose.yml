@@ -8,9 +8,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://sentinel:sentinel@postgres:5432/sentinel
       - REDIS_URL=redis://redis:6379/0
+      - ZAP_API_URL=http://zap:8080
     depends_on:
       - postgres
       - redis
+      - zap
 
   frontend:
     build: ./frontend
@@ -18,6 +20,12 @@ services:
       - "3000:3000"
     depends_on:
       - api
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    command: zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
+    ports:
+      - "8080:8080"
 
   postgres:
     image: postgres:16-alpine

@@ -1,9 +1,9 @@
-import time
 from datetime import datetime, timezone
 from app.core.celery_app import celery_app
 from app.db.session import SessionLocal
 from app.db.models import Scan, Finding
 from app.engine.sast_engine import run_sast_scan
+from app.engine.dast_engine import run_dast_scan
 
 
 @celery_app.task(name="run_stub_scan_task")
@@ -21,23 +21,27 @@ def run_stub_scan_task(scan_id: int):
         db.commit()
 
         if scan.target_type == "repo":
-            # Real SAST scan via Semgrep
-            sast_results = run_sast_scan(scan.target)
-            for item in sast_results:
-                finding = Finding(
-                    scan_id=scan.id,
-                    source=item.get("source", "sast"),
-                    rule_id=item.get("rule_id", "sast-rule"),
-                    file_path=item.get("file_path"),
-                    line_number=item.get("line_number"),
-                    code_snippet=item.get("code_snippet"),
-                    severity_raw=item.get("severity_raw", "WARNING"),
-                    status="open",
-                )
-                db.add(finding)
+            # SAST scan via Semgrep
+            results = run_sast_scan(scan.target)
+        elif scan.target_type == "url":
+            # DAST baseline scan via OWASP ZAP / Passive HTTP check
+            results = run_dast_scan(scan.target)
         else:
-            # URL target stub for now (PR 5 DAST)
-            time.sleep(0.5)
+            results = []
+
+        # Store findings
+        for item in results:
+            finding = Finding(
+                scan_id=scan.id,
+                source=item.get("source", "dast"),
+                rule_id=item.get("rule_id", "dast-rule"),
+                file_path=item.get("file_path"),
+                line_number=item.get("line_number", 1),
+                code_snippet=item.get("code_snippet"),
+                severity_raw=item.get("severity_raw", "MEDIUM"),
+                status="open",
+            )
+            db.add(finding)
 
         # Mark scan as completed
         scan.status = "completed"
@@ -45,6 +49,7 @@ def run_stub_scan_task(scan_id: int):
         db.commit()
 
         return {"status": "success", "scan_id": scan_id}
+
     except Exception as e:
         db.rollback()
         if scan:
