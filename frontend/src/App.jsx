@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Cpu, Database, Server, User, LogOut, Lock } from 'lucide-react';
+import { ShieldCheck, User, LogOut, Lock } from 'lucide-react';
 import AuthModal from './components/AuthModal';
+import ScanLauncher from './components/ScanLauncher';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('sentinel_token'));
@@ -38,7 +39,7 @@ export default function App() {
           <ShieldCheck className="w-8 h-8 text-emerald-400" />
           <h1 className="text-xl font-bold tracking-tight text-white">Sentinel</h1>
           <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            v0.1.0 JWT Auth
+            v0.1.0 PR3 Gate
           </span>
         </div>
 
@@ -72,36 +73,28 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full p-8 flex flex-col justify-center items-center text-center">
-        <div className="inline-flex items-center justify-center p-4 bg-emerald-500/10 text-emerald-400 rounded-full mb-6 ring-1 ring-emerald-500/20">
-          <ShieldCheck className="w-12 h-12" />
-        </div>
-        <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white mb-4">
-          AI-Native Application Security Platform
-        </h2>
-        <p className="text-slate-400 max-w-2xl mb-12 text-lg">
-          {currentUser
-            ? `Authenticated as ${currentUser.email} (${currentUser.role}). Platform session active.`
-            : 'Sign in to access authorized security audit workflows, explicit consent logs, and findings.'}
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
-          <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-left">
-            <Server className="w-6 h-6 text-indigo-400 mb-3" />
-            <h3 className="font-semibold text-white mb-1">FastAPI + JWT</h3>
-            <p className="text-xs text-slate-400">OAuth2 Bearer tokens with Role-Based Access Control (RBAC).</p>
+      <main className="flex-1 max-w-5xl mx-auto w-full p-8">
+        {currentUser ? (
+          <ScanLauncher token={token} />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="inline-flex items-center justify-center p-4 bg-emerald-500/10 text-emerald-400 rounded-full mb-6 ring-1 ring-emerald-500/20">
+              <ShieldCheck className="w-12 h-12" />
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white mb-4">
+              AI-Native Application Security Platform
+            </h2>
+            <p className="text-slate-400 max-w-2xl mb-8 text-lg">
+              Sign in to manage explicit target consent logs and launch security audit jobs.
+            </p>
+            <button
+              onClick={() => setIsAuthOpen(true)}
+              className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 font-bold text-slate-950 rounded-xl text-sm transition-all"
+            >
+              Sign In / Create Account
+            </button>
           </div>
-          <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-left">
-            <Database className="w-6 h-6 text-cyan-400 mb-3" />
-            <h3 className="font-semibold text-white mb-1">Consent Log Gate</h3>
-            <p className="text-xs text-slate-400">Immutable audit log enforcing explicit scan authorization.</p>
-          </div>
-          <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-left">
-            <Cpu className="w-6 h-6 text-emerald-400 mb-3" />
-            <h3 className="font-semibold text-white mb-1">React Auth Interface</h3>
-            <p className="text-xs text-slate-400">Integrated login & registration modal with persistent JWT storage.</p>
-          </div>
-        </div>
+        )}
       </main>
 
       <AuthModal
