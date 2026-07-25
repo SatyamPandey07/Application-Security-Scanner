@@ -7,6 +7,7 @@ from app.engine.sast_engine import run_sast_scan
 from app.engine.dast_engine import run_dast_scan
 from app.engine.dependency_secrets_engine import run_dependency_scan, run_secrets_scan
 from app.engine.ai_remediation import validate_and_remediate_finding
+from app.engine.cvss_calculator import map_finding_to_cvss
 
 
 @celery_app.task(name="run_stub_scan_task")
@@ -35,11 +36,14 @@ def run_stub_scan_task(scan_id: int):
             # DAST baseline scan via OWASP ZAP / Passive HTTP check
             results = run_dast_scan(scan.target)
 
-        # Store all findings in DB with AI validation post-processing
+        # Store all findings in DB with AI validation post-processing & CVSS scoring
         for item in results:
             file_path = item.get("file_path")
             line_number = item.get("line_number", 1)
             code_snippet = item.get("code_snippet", "")
+            severity_raw = item.get("severity_raw", "MEDIUM")
+            rule_id = item.get("rule_id", "security-rule")
+            source = item.get("source", "sast")
 
             # Extract surrounding code context if scanning local file repo
             surrounding_code = ""
@@ -56,7 +60,7 @@ def run_stub_scan_task(scan_id: int):
 
             # Run AI Validation & Remediation Layer
             ai_data = validate_and_remediate_finding(
-                rule_id=item.get("rule_id", "security-rule"),
+                rule_id=rule_id,
                 file_path=file_path,
                 line_number=line_number,
                 code_snippet=code_snippet,
@@ -68,14 +72,18 @@ def run_stub_scan_task(scan_id: int):
             conf_val = float(ai_data.get("confidence", 0.7))
             status_val = "confirmed" if (is_true_pos and conf_val >= 0.6) else "low_confidence"
 
+            # Calculate CVSS v3.1 Score
+            cvss_info = map_finding_to_cvss(source=source, severity_raw=severity_raw, rule_id=rule_id)
+
             finding = Finding(
                 scan_id=scan.id,
-                source=item.get("source", "sast"),
-                rule_id=item.get("rule_id", "security-rule"),
+                source=source,
+                rule_id=rule_id,
                 file_path=file_path,
                 line_number=line_number,
                 code_snippet=code_snippet,
-                severity_raw=item.get("severity_raw", "MEDIUM"),
+                severity_raw=severity_raw,
+                cvss_score=cvss_info["cvss_score"],
                 ai_confidence=f"{conf_val:.2f}",
                 ai_explanation=ai_data.get("plain_english_explanation"),
                 ai_fix_diff=ai_data.get("suggested_fix_diff"),
