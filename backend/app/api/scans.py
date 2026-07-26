@@ -1,5 +1,5 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -8,6 +8,7 @@ from app.core.security import get_current_user
 from app.schemas.scans import ScanCreate, ScanOut, FindingOut
 from app.tasks.scan_tasks import run_stub_scan_task
 from app.engine.cvss_calculator import calculate_priority_score
+from app.engine.compliance_mapper import generate_compliance_report, generate_compliance_csv
 
 router = APIRouter(prefix="/scans", tags=["Scans"])
 
@@ -134,3 +135,44 @@ def get_scan_findings(
         results.sort(key=lambda x: sev_rank.get(x.severity_raw.upper(), 0), reverse=True)
 
     return results
+
+
+@router.get("/{scan_id}/compliance")
+def get_scan_compliance_report(
+    scan_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    scan = db.query(Scan).filter(Scan.id == scan_id, Scan.user_id == current_user.id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail=f"Scan with ID {scan_id} not found.")
+
+    findings = db.query(Finding).filter(Finding.scan_id == scan_id).all()
+    finding_dicts = [
+        {"source": f.source, "status": f.status, "rule_id": f.rule_id, "severity_raw": f.severity_raw, "file_path": f.file_path}
+        for f in findings
+    ]
+    return generate_compliance_report(finding_dicts)
+
+
+@router.get("/{scan_id}/compliance/export")
+def export_scan_compliance_csv(
+    scan_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    scan = db.query(Scan).filter(Scan.id == scan_id, Scan.user_id == current_user.id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail=f"Scan with ID {scan_id} not found.")
+
+    findings = db.query(Finding).filter(Finding.scan_id == scan_id).all()
+    finding_dicts = [
+        {"source": f.source, "status": f.status, "rule_id": f.rule_id, "severity_raw": f.severity_raw, "file_path": f.file_path}
+        for f in findings
+    ]
+    csv_data = generate_compliance_csv(finding_dicts)
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=sentinel_compliance_scan_{scan_id}.csv"}
+    )
