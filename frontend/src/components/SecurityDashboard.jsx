@@ -66,7 +66,7 @@ function groupByArea(findings) {
 // ── Plain summary sentence ───────────────────────────────────────────────────
 function buildSummary(findings) {
   const total = findings.length;
-  if (total === 0) return 'No issues found. Your site looks clean! 🎉';
+  if (total === 0) return 'No issues found. Your site looks clean.';
   const urgent = findings.filter(f => riskLabel(f.plain_risk_level) === 'Fix this now').length;
   const soon   = findings.filter(f => riskLabel(f.plain_risk_level) === 'Fix this soon').length;
   let msg = `We found ${total} thing${total !== 1 ? 's' : ''} worth looking at on your website.`;

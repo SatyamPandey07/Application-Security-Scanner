@@ -351,7 +351,7 @@ export default function FindingDetailModal({ finding, token, simpleDefault = tru
               {/* Plain-language context, collapsed, for handoff to non-technical stakeholders */}
               {hasPlainFields && (
                 <CollapsiblePanel
-                  title="📋 Plain-language summary (for sharing with non-technical stakeholders)"
+                  title="Plain-language summary (for sharing with non-technical stakeholders)"
                   testId="plain-context-collapsible"
                 >
                   <PlainLanguagePanel finding={finding} />

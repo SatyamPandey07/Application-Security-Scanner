@@ -71,7 +71,7 @@ PLAIN_FIELD_NAMES = [
 ]
 
 # ---------------------------------------------------------------------------
-# Rule-Based Layman Knowledge Base (Rule ID -> Detailed Layman Explanation)
+# Rule-Based Layman Knowledge Base (Human-written Tone, No em-dashes)
 # ---------------------------------------------------------------------------
 RULE_LAYMAN_MAP: Dict[str, Dict[str, str]] = {
     "10020": {
@@ -79,7 +79,7 @@ RULE_LAYMAN_MAP: Dict[str, Dict[str, str]] = {
         "plain_whats_wrong": "Your web server is missing a protective header (X-Frame-Options) that stops other sites from embedding your web pages inside hidden frames. Without this header, malicious actors can overlay invisible click traps over your site.",
         "plain_why_it_exists": "Web servers by default allow any website to embed your pages in an iframe unless you explicitly configure security response headers to block framing.",
         "plain_real_world_impact": "Attackers could create a fake website that looks like a prize giveaway, put your real login form invisibly underneath it, and trick users into clicking buttons that transfer money or delete their accounts without realizing it.",
-        "plain_risk_level": "Worth fixing — prevents deceptive click-trap attacks against site visitors.",
+        "plain_risk_level": "Worth fixing - prevents deceptive click-trap attacks against site visitors.",
         "plain_what_to_do": "Ask your web host or developer to add the 'X-Frame-Options: DENY' or 'SAMEORIGIN' header to all web server responses.",
         "feature_area": "Customer Data & Privacy",
     },
@@ -88,7 +88,7 @@ RULE_LAYMAN_MAP: Dict[str, Dict[str, str]] = {
         "plain_whats_wrong": "Your web server does not send a Content Security Policy (CSP) header. This header acts as a browser whitelist that tells visitors' browsers which scripts and images are safe to load.",
         "plain_why_it_exists": "Most modern web applications do not enable a restrictive Content Security Policy by default because it requires defining allowed domain origins for external scripts.",
         "plain_real_world_impact": "If an attacker ever finds a way to insert malicious text into your site, the visitor's browser will execute their scripts without restriction, potentially stealing login tokens or credit card inputs.",
-        "plain_risk_level": "Fix this soon — adding a Content Security Policy stops many browser-based attacks in their tracks.",
+        "plain_risk_level": "Fix this soon - adding a Content Security Policy stops many browser-based attacks in their tracks.",
         "plain_what_to_do": "Have your developer configure a Content Security Policy (CSP) header that restricts script execution to trusted domains.",
         "feature_area": "Search & Browsing",
     },
@@ -97,7 +97,7 @@ RULE_LAYMAN_MAP: Dict[str, Dict[str, str]] = {
         "plain_whats_wrong": "Your website loads external software code from another web server (like a public CDN) without verifying if that code has been altered or tampered with before running it.",
         "plain_why_it_exists": "Developers often link to external script files for speed, but forget to include cryptographic hash checks that verify the file hasn't changed on the remote server.",
         "plain_real_world_impact": "If the external library server gets compromised, hackers could replace the library file with a malicious version that runs inside every visitor's browser.",
-        "plain_risk_level": "Worth fixing — protects your users if a third-party server is compromised.",
+        "plain_risk_level": "Worth fixing - protects your users if a third-party server is compromised.",
         "plain_what_to_do": "Ask your developer to add 'integrity' cryptographic hashes to all external script and style links.",
         "feature_area": "Other",
     },
@@ -106,7 +106,7 @@ RULE_LAYMAN_MAP: Dict[str, Dict[str, str]] = {
         "plain_whats_wrong": "The session cookies your site gives to logged-in users are missing safety flags (HttpOnly or Secure). These flags prevent malicious scripts from reading the cookie and ensure it is only sent over encrypted connections.",
         "plain_why_it_exists": "Cookie settings often default to basic permissions unless developer code explicitly attaches HttpOnly, Secure, and SameSite attributes during login.",
         "plain_real_world_impact": "If a visitor clicks a suspicious link or runs an untrusted script, their active login session could be intercepted or hijacked.",
-        "plain_risk_level": "Fix this now — login session cookies should always be locked down.",
+        "plain_risk_level": "Fix this now - login session cookies should always be locked down.",
         "plain_what_to_do": "Configure your session cookie settings to include HttpOnly, Secure, and SameSite=Lax flags.",
         "feature_area": "Login & Accounts",
     },
@@ -115,7 +115,7 @@ RULE_LAYMAN_MAP: Dict[str, Dict[str, str]] = {
         "plain_whats_wrong": "A text input field passes what users type directly into database commands without checking it first. Instead of treating input as simple text, the database reads it as instructions.",
         "plain_why_it_exists": "This happens when developer code combines raw text strings into database queries instead of using safe parameterized query placeholders.",
         "plain_real_world_impact": "An attacker could type special database commands into a search bar or login form to view, modify, or erase all user accounts and private data.",
-        "plain_risk_level": "Fix this now — this is a critical issue that threatens database privacy.",
+        "plain_risk_level": "Fix this now - this is a critical issue that threatens database privacy.",
         "plain_what_to_do": "Instruct your development team to use prepared statements or parameterized queries for all database interactions.",
         "feature_area": "Login & Accounts",
     },
@@ -124,7 +124,7 @@ RULE_LAYMAN_MAP: Dict[str, Dict[str, str]] = {
         "plain_whats_wrong": "A confidential password, API key, or encryption secret was written directly inside the application's source files instead of being stored safely in an environment vault.",
         "plain_why_it_exists": "Developers often hardcode secret keys during local testing and accidentally push them into the application codebase.",
         "plain_real_world_impact": "Anyone who gains access to the code repository or site assets can copy the secret key to access backend services or forge user credentials.",
-        "plain_risk_level": "Fix this now — secret keys should be revoked and moved out of code immediately.",
+        "plain_risk_level": "Fix this now - secret keys should be revoked and moved out of code immediately.",
         "plain_what_to_do": "Immediately revoke the exposed key, generate a new one, and store it in an environment variable file (.env).",
         "feature_area": "Admin & Backend",
     },
@@ -188,7 +188,7 @@ def get_rule_layman_fallback(rule_id: str) -> Dict[str, str]:
             "plain_whats_wrong": "A search or input form sends user text directly into database commands without validating it. This allows commands to run instead of plain text search.",
             "plain_why_it_exists": "The code combines text strings into database queries instead of using safe placeholder parameters.",
             "plain_real_world_impact": "An attacker could view, alter, or delete private database records or customer accounts.",
-            "plain_risk_level": "Fix this now — severe risk to database confidentiality.",
+            "plain_risk_level": "Fix this now - severe risk to database confidentiality.",
             "plain_what_to_do": "Have your development team update database queries to use safe parameterized placeholders.",
             "feature_area": "Login & Accounts",
         }
@@ -198,7 +198,7 @@ def get_rule_layman_fallback(rule_id: str) -> Dict[str, str]:
             "plain_whats_wrong": "A secret security key or internal password was written directly in the code files instead of a safe environment vault.",
             "plain_why_it_exists": "Keys are frequently written in code during development testing and left behind by accident.",
             "plain_real_world_impact": "Anyone viewing your application files could copy the key and access administrative services.",
-            "plain_risk_level": "Fix this now — secret keys should never be present in public code files.",
+            "plain_risk_level": "Fix this now - secret keys should never be present in public code files.",
             "plain_what_to_do": "Revoke the exposed key, generate a new secret key, and store it in environment variable files.",
             "feature_area": "Admin & Backend",
         }
@@ -208,12 +208,24 @@ def get_rule_layman_fallback(rule_id: str) -> Dict[str, str]:
             "plain_whats_wrong": "Your web server is missing security configuration headers that instruct browsers to enforce strict safety policies on scripts and cookies.",
             "plain_why_it_exists": "Web server software defaults to broad permissions unless custom security response headers are added.",
             "plain_real_world_impact": "Visitors browsing your website are less protected against click traps or unauthorized script execution.",
-            "plain_risk_level": "Worth fixing — enhances automatic browser security for all visitors.",
+            "plain_risk_level": "Worth fixing - enhances automatic browser security for all visitors.",
             "plain_what_to_do": "Ask your web host or developer to add standard security headers to your server responses.",
             "feature_area": "Customer Data & Privacy",
         }
 
     return _default_result()
+
+
+def _clean_human_text(text: str) -> str:
+    """Ensure plain text sounds like a human wrote it: remove em-dashes and emojis."""
+    if not text:
+        return text
+    # Replace em-dashes and en-dashes with standard hyphens or spaces
+    cleaned = text.replace("—", " - ").replace("–", " - ")
+    # Normalize multiple hyphens/spaces
+    cleaned = re.sub(r"\s*-\s*-\s*", " - ", cleaned)
+    cleaned = re.sub(r" {2,}", " ", cleaned).strip()
+    return cleaned
 
 
 def _build_main_prompt(
@@ -224,7 +236,7 @@ def _build_main_prompt(
     surrounding_code: str,
     route_context: Optional[str],
 ) -> str:
-    return f"""You are Sentinel's AI Security Engine. Review the following security finding flagged by an automated scanner.
+    return f"""You are a helpful human security specialist explaining scan findings to a non-technical website owner. Review the following security finding.
 
 Finding Details:
 - Rule ID: {rule_id}
@@ -241,7 +253,7 @@ Surrounding Code Context (~20 lines):
 {surrounding_code or code_snippet or 'N/A'}
 ```
 
-Respond with STRICT JSON containing ONLY the following keys (no markdown, no commentary outside the JSON):
+Respond with STRICT JSON containing ONLY the following keys (no markdown outside JSON):
 {{
   "is_likely_true_positive": boolean,
   "confidence": float between 0.0 and 1.0,
@@ -250,25 +262,26 @@ Respond with STRICT JSON containing ONLY the following keys (no markdown, no com
   "suggested_fix_diff": "unified git diff patch string fixing the issue, or null",
 
   "plain_title": "A short plain-English headline, max 10 words, NO technical jargon. Example: 'Your search box can be tricked into running harmful code'",
-  "plain_location": "WHERE a normal user would find this — describe the page, button, or form they would click, NEVER use a file path or line number. If there is no live page, say what part of the system is affected in plain terms.",
-  "plain_whats_wrong": "A detailed 2 to 3 sentence layman explanation answering 'What is this bug in simple everyday terms?'. Explain what is happening without using any technical jargon so any non-technical site owner immediately understands.",
-  "plain_why_it_exists": "A 1 to 2 sentence layman explanation answering 'Why does this issue exist in the website or code?' (e.g. how it was created or why default settings allowed it).",
+  "plain_location": "WHERE a normal user would find this - describe the page, button, or form they would click, NEVER use a file path or line number. If there is no live page, say what part of the system is affected in plain terms.",
+  "plain_whats_wrong": "A detailed 2 to 3 sentence explanation answering 'What is this bug in simple terms?'. Write naturally like a human colleague explaining it to a team member.",
+  "plain_why_it_exists": "A 1 to 2 sentence explanation answering 'Why does this issue exist in the website or code?' in natural human language.",
   "plain_real_world_impact": "What could actually happen to the business or customers if this is exploited? Be concrete and specific.",
-  "plain_risk_level": "One of: 'Fix this now', 'Fix this soon', 'Worth fixing', 'Minor' — followed by a dash and a one-line plain reason. Example: 'Fix this now — this is easy to find and could expose customer passwords.'",
-  "plain_what_to_do": "1-2 plain-language next steps written for someone who will hire a developer, not do it themselves.",
+  "plain_risk_level": "One of: 'Fix this now', 'Fix this soon', 'Worth fixing', 'Minor' - followed by a hyphen and a one-line plain reason. Example: 'Fix this now - this is easy to find and could expose customer passwords.' DO NOT use em-dashes (—).",
+  "plain_what_to_do": "1-2 plain-language next steps written naturally for someone who will hire a developer, not do it themselves.",
   "feature_area": "One of exactly: 'Login & Accounts', 'Payments & Checkout', 'Customer Data & Privacy', 'Search & Browsing', 'Contact & Forms', 'Admin & Backend', 'Other'. Infer from the route/page context."
 }}
 
 CRITICAL RULES for plain_* fields:
+- NEVER use em-dashes (—) or en-dashes (–). Use standard hyphens (-) or normal punctuation.
+- NEVER use emojis or decorative icons in plain_* text fields.
 - NEVER use these words or abbreviations in plain_* fields: injection, XSS, CSRF, payload, sanitize, sanitise, vector, CVSS, endpoint, deserialization, SSTI, SSRF, LFI, RFI, RCE, IDOR, BOLA, DOM, traversal, parameterize, ORM, API, CVE, OWASP, zero-day, buffer overflow, attack surface.
-- plain_location must describe a user-visible page or feature, NEVER a file path or line number.
-- All plain_* fields must be written as if explaining to someone who has never heard security terms.
+- Write naturally as a human colleague would, using clear, conversational language.
 """
 
 
 def _build_rewrite_prompt(offending_fields: Dict[str, str], context_summary: str) -> str:
     fields_block = json.dumps(offending_fields, indent=2)
-    return f"""You previously wrote the following plain-language security descriptions, but they contain technical jargon that must be removed.
+    return f"""You previously wrote the following plain-language security descriptions, but they contain technical jargon or improper formatting that must be removed.
 
 Context: {context_summary}
 
@@ -276,8 +289,9 @@ Fields that need rewriting (current values):
 {fields_block}
 
 Rewrite ONLY these fields. Return STRICT JSON with the same keys and new values that:
+- Write naturally as a human colleague explaining to a team member
+- Use NO em-dashes (—) and NO decorative emojis/icons
 - Use absolutely NO technical terms (no injection, XSS, CSRF, payload, sanitize, sanitise, vector, CVSS, endpoint, deserialization, IDOR, BOLA, DOM, traversal, ORM, API, CVE, OWASP, zero-day, buffer overflow, attack surface)
-- Are written as if explaining to a relative who does not work in technology
 - Keep plain_location describing a user-visible page/feature, never a file path
 
 Respond with STRICT JSON only, no commentary.
@@ -309,7 +323,7 @@ def validate_and_remediate_finding(
 
     if not ai_enabled or not api_key:
         logger.info("AI validation disabled or ANTHROPIC_API_KEY not set. Using rule fallback.")
-        return default_result
+        return _clean_result_human_formatting(default_result)
 
     prompt = _build_main_prompt(
         rule_id=rule_id,
@@ -370,7 +384,7 @@ def validate_and_remediate_finding(
         loc = result.get("plain_location", "")
         if plain_location_looks_like_path(loc):
             result["plain_location"] = (
-                "Behind the scenes in the application — not something customers see "
+                "Behind the scenes in the application, not something customers see "
                 "directly, but it affects how their data is processed."
             )
 
@@ -378,11 +392,19 @@ def validate_and_remediate_finding(
         if result.get("feature_area") not in VALID_FEATURE_AREAS:
             result["feature_area"] = "Other"
 
-        return result
+        return _clean_result_human_formatting(result)
 
     except Exception as e:
         logger.error(f"Anthropic API call failed: {e}. Falling back to defaults.")
-        return default_result
+        return _clean_result_human_formatting(default_result)
+
+
+def _clean_result_human_formatting(result: Dict[str, Any]) -> Dict[str, Any]:
+    """Post-process plain_* fields to strip em-dashes and ensure human formatting."""
+    for field in PLAIN_FIELD_NAMES:
+        if field in result and isinstance(result[field], str):
+            result[field] = _clean_human_text(result[field])
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -441,7 +463,7 @@ def parse_ai_json_response(raw_text: str, fallback: Dict[str, Any]) -> Dict[str,
             parsed.get("plain_real_world_impact", fb.get("plain_real_world_impact", "This could affect the security of your users or data."))
         ),
         "plain_risk_level": str(
-            parsed.get("plain_risk_level", fb.get("plain_risk_level", "Worth fixing — a security issue was detected."))
+            parsed.get("plain_risk_level", fb.get("plain_risk_level", "Worth fixing - a security issue was detected."))
         ),
         "plain_what_to_do": str(
             parsed.get("plain_what_to_do", fb.get("plain_what_to_do", "Ask your developer to review and fix this issue."))
@@ -483,7 +505,7 @@ def _default_result(override: Optional[Dict[str, Any]] = None) -> Dict[str, Any]
         "plain_whats_wrong": "A security issue was found on your website. This happens when certain safety checks are missing or turned off, leaving a weakness that could be used inappropriately.",
         "plain_why_it_exists": "This usually happens when default configuration settings leave security rules turned off or when form inputs are processed directly without validation.",
         "plain_real_world_impact": "This could affect the security of your users or data if someone attempts to misuse this vulnerability.",
-        "plain_risk_level": "Worth fixing — a security issue was detected.",
+        "plain_risk_level": "Worth fixing - a security issue was detected.",
         "plain_what_to_do": "Ask your developer to review and fix this issue by turning on recommended safety settings.",
         "feature_area": "Other",
     }

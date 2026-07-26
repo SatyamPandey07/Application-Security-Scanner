@@ -90,7 +90,7 @@ CLEAN_AI_RESPONSE = """{
   "plain_location": "The login page where customers type their email and password",
   "plain_whats_wrong": "Someone can type a clever trick into the login box and your website will treat them as if they entered the right password, letting them in without one.",
   "plain_real_world_impact": "A stranger could log into any customer account without knowing the password, access personal information, and make changes on their behalf.",
-  "plain_risk_level": "Fix this now — anyone can try this trick from anywhere, and it could expose every customer account.",
+  "plain_risk_level": "Fix this now - anyone can try this trick from anywhere, and it could expose every customer account.",
   "plain_what_to_do": "Ask your developer to make sure anything a customer types into a form gets checked before the website acts on it. This is a well-known type of bug with a standard fix.",
   "feature_area": "Login & Accounts"
 }"""
@@ -105,7 +105,7 @@ JARGON_AI_RESPONSE = """{
   "plain_location": "The search endpoint at /api/search?q=",
   "plain_whats_wrong": "Missing input sanitization allows arbitrary script injection into the DOM via the XSS vector.",
   "plain_real_world_impact": "An attacker can craft a payload that exfiltrates session cookies.",
-  "plain_risk_level": "Fix this soon — CVSS 6.1, medium severity XSS",
+  "plain_risk_level": "Fix this soon - CVSS 6.1, medium severity XSS",
   "plain_what_to_do": "Sanitize all user inputs and implement a Content Security Policy to block injection vectors.",
   "feature_area": "Search & Browsing"
 }"""
@@ -115,7 +115,7 @@ CLEAN_REWRITE_RESPONSE = """{
   "plain_location": "The search bar at the top of your website",
   "plain_whats_wrong": "Someone can type a hidden trick into the search box and your website will run their code instead of just performing a normal search.",
   "plain_real_world_impact": "A stranger could steal a customer's login session and get into their account, or use your site to spread harmful content to visitors.",
-  "plain_risk_level": "Fix this soon — this is relatively easy to find and could affect customers browsing your site.",
+  "plain_risk_level": "Fix this soon - this is relatively easy to find and could affect customers browsing your site.",
   "plain_what_to_do": "Ask your developer to make sure anything typed into the search box is treated as text only and cannot change how the page works. This is a well-known type of bug with a standard fix."
 }"""
 
@@ -591,7 +591,7 @@ class TestLowConfidenceRelabeling:
           "plain_location": "Behind the scenes in the application",
           "plain_whats_wrong": "A potential issue was found that a developer should review.",
           "plain_real_world_impact": "This could affect the security of your users if confirmed.",
-          "plain_risk_level": "Worth fixing — a developer should review this to be sure.",
+          "plain_risk_level": "Worth fixing - a developer should review this to be sure.",
           "plain_what_to_do": "Ask your developer to look at this and confirm whether it needs fixing.",
           "feature_area": "Admin & Backend"
         }"""
