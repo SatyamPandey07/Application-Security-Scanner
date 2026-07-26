@@ -1,12 +1,13 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 
 class ScanCreate(BaseModel):
     target: str = Field(..., json_schema_extra={"example": "https://example.com"})
     target_type: str = Field(..., json_schema_extra={"example": "url"})  # url or repo
     authorized: bool = Field(False, description="Explicit user confirmation of ownership or authorization")
+    auth_credentials: Optional[Dict[str, Any]] = None  # Optional login credentials for authenticated DAST / IDOR checks
 
 
 class FindingOut(BaseModel):

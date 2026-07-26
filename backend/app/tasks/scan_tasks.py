@@ -1,4 +1,5 @@
 import os
+from typing import Dict, Any, Optional
 from datetime import datetime, timezone
 from app.core.celery_app import celery_app
 from app.db.session import SessionLocal
@@ -8,10 +9,11 @@ from app.engine.dast_engine import run_dast_scan
 from app.engine.dependency_secrets_engine import run_dependency_scan, run_secrets_scan
 from app.engine.ai_remediation import validate_and_remediate_finding
 from app.engine.cvss_calculator import map_finding_to_cvss
+from app.engine.idor_engine import run_authenticated_idor_scan
 
 
 @celery_app.task(name="run_stub_scan_task")
-def run_stub_scan_task(scan_id: int):
+def run_stub_scan_task(scan_id: int, auth_credentials: Optional[Dict[str, Any]] = None):
     scan = None
     db = SessionLocal()
     try:
@@ -34,7 +36,19 @@ def run_stub_scan_task(scan_id: int):
 
         elif scan.target_type == "url":
             # DAST baseline scan via OWASP ZAP / Passive HTTP check
-            results = run_dast_scan(scan.target)
+            dast_findings = run_dast_scan(scan.target)
+            results = dast_findings
+
+            # Authenticated IDOR / BOLA Check if credentials provided
+            if auth_credentials and "user_a" in auth_credentials and "user_b" in auth_credentials:
+                idor_findings = run_authenticated_idor_scan(
+                    target_url=scan.target,
+                    user_a_creds=auth_credentials["user_a"],
+                    user_b_creds=auth_credentials["user_b"],
+                    auth_login_endpoint=auth_credentials.get("login_endpoint", "/auth/login"),
+                    test_resource_endpoints=auth_credentials.get("test_endpoints"),
+                )
+                results.extend(idor_findings)
 
         # Store all findings in DB with AI validation post-processing & CVSS scoring
         for item in results:

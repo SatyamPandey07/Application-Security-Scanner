@@ -57,8 +57,8 @@ def submit_scan(
     db.commit()
     db.refresh(scan)
 
-    # 3. Enqueue background task
-    run_stub_scan_task.delay(scan.id)
+    # 3. Enqueue background task with optional auth credentials
+    run_stub_scan_task.delay(scan.id, auth_credentials=scan_data.auth_credentials)
 
     return scan
 
@@ -89,7 +89,7 @@ def get_scan_by_id(
 @router.get("/{scan_id}/findings", response_model=List[FindingOut])
 def get_scan_findings(
     scan_id: int,
-    source: Optional[str] = Query(None, description="Filter by finding source (sast, dast, dependency, secret)"),
+    source: Optional[str] = Query(None, description="Filter by finding source (sast, dast, dependency, secret, access_control)"),
     severity: Optional[str] = Query(None, description="Filter by severity (CRITICAL, HIGH, MEDIUM, LOW)"),
     finding_status: Optional[str] = Query(None, alias="status", description="Filter by status (confirmed, low_confidence)"),
     sort_by: str = Query("priority", description="Sort by field (priority, cvss, severity, status)"),
