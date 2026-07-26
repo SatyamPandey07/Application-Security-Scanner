@@ -102,6 +102,15 @@ def run_stub_scan_task(scan_id: int, auth_credentials: Optional[Dict[str, Any]] 
                 ai_explanation=ai_data.get("plain_english_explanation"),
                 ai_fix_diff=ai_data.get("suggested_fix_diff"),
                 status=status_val,
+                # Plain-language fields (PR 8 & enhanced)
+                plain_title=ai_data.get("plain_title"),
+                plain_location=ai_data.get("plain_location"),
+                plain_whats_wrong=ai_data.get("plain_whats_wrong"),
+                plain_why_it_exists=ai_data.get("plain_why_it_exists"),
+                plain_real_world_impact=ai_data.get("plain_real_world_impact"),
+                plain_risk_level=ai_data.get("plain_risk_level"),
+                plain_what_to_do=ai_data.get("plain_what_to_do"),
+                feature_area=ai_data.get("feature_area"),
             )
             db.add(finding)
 

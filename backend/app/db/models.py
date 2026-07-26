@@ -59,6 +59,17 @@ class Finding(Base):
     ai_confidence = Column(String(50), nullable=True)
     ai_explanation = Column(Text, nullable=True)
     ai_fix_diff = Column(Text, nullable=True)
-    status = Column(String(50), nullable=False, default="open")  # open, confirmed, false_positive, fixed
+    status = Column(String(50), nullable=False, default="open")  # open, confirmed, low_confidence, false_positive, fixed
+
+    # ── Plain-language fields (added in PR 8 & enhanced) ─────────────────
+    plain_title = Column(Text, nullable=True)           # Short headline, no jargon
+    plain_location = Column(Text, nullable=True)        # User-visible location, never a file path
+    plain_whats_wrong = Column(Text, nullable=True)     # Detailed 2-3 sentence layman explanation
+    plain_why_it_exists = Column(Text, nullable=True)   # Layman explanation of why this bug exists
+    plain_real_world_impact = Column(Text, nullable=True)  # Concrete business impact
+    plain_risk_level = Column(String(120), nullable=True)  # e.g. "Fix this now — ..."
+    plain_what_to_do = Column(Text, nullable=True)      # Next steps for non-technical owner
+    feature_area = Column(String(100), nullable=True)   # Login & Accounts, Payments & Checkout, etc.
 
     scan = relationship("Scan", back_populates="findings")
+

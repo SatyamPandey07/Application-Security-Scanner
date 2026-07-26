@@ -25,6 +25,14 @@ class FindingOut(BaseModel):
     ai_explanation: Optional[str] = None
     ai_fix_diff: Optional[str] = None
     status: str
+    plain_title: Optional[str] = None
+    plain_location: Optional[str] = None
+    plain_whats_wrong: Optional[str] = None
+    plain_why_it_exists: Optional[str] = None
+    plain_real_world_impact: Optional[str] = None
+    plain_risk_level: Optional[str] = None
+    plain_what_to_do: Optional[str] = None
+    feature_area: Optional[str] = None
 
     class Config:
         from_attributes = True

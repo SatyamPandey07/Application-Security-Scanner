@@ -44,7 +44,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     expired_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Token has expired",
+        detail="Token has expired. Please sign in again.",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:

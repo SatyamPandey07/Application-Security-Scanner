@@ -100,11 +100,11 @@ graph LR
 
 ## 📸 Interface Screenshots
 
-### Sentinel Platform Application Landing Page
-![Sentinel Landing Page](file:///Users/satyampandey/.gemini/antigravity-ide/brain/df32dae4-8cd9-4e4a-b5d4-27158de15151/sentinel_app_home.png)
+### Sentinel Platform Application Landing Page (E2E Test Recording)
+![Sentinel E2E Test Recording](/Users/satyampandey/.gemini/antigravity-ide/brain/556ff5d1-97e9-4f89-be30-7c4a88f34490/sentinel_e2e_fixed_1785066592989.webp)
 
 ### Sentinel Authentication & Registration Modal
-![Sentinel Auth Modal](file:///Users/satyampandey/.gemini/antigravity-ide/brain/df32dae4-8cd9-4e4a-b5d4-27158de15151/sentinel_auth_modal.png)
+![Sentinel Auth Modal](/Users/satyampandey/.gemini/antigravity-ide/brain/556ff5d1-97e9-4f89-be30-7c4a88f34490/.system_generated/click_feedback/click_feedback_1785067098489.png)
 
 ---
 

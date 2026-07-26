@@ -1,8 +1,81 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Calendar, ShieldCheck, Activity } from 'lucide-react';
+import { TrendingUp, Calendar, ShieldCheck, Activity, BarChart2 } from 'lucide-react';
+
+function TrendLineChart({ data }) {
+  if (!data || data.length === 0) return null;
+
+  const width = 600;
+  const height = 180;
+  const padding = 30;
+
+  const maxVal = Math.max(...data.map(d => d.total_findings), 10);
+  const minVal = 0;
+
+  const points = data.map((d, i) => {
+    const x = data.length === 1 ? width / 2 : padding + (i / (data.length - 1)) * (width - padding * 2);
+    const y = height - padding - ((d.total_findings - minVal) / (maxVal - minVal)) * (height - padding * 2);
+    return { x, y, val: d.total_findings, scanId: d.scan_id, date: new Date(d.started_at).toLocaleDateString() };
+  });
+
+  const pathD = points.length === 1
+    ? `M ${points[0].x - 40} ${points[0].y} L ${points[0].x + 40} ${points[0].y}`
+    : points.reduce((acc, p, i) => i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, '');
+
+  const areaD = points.length === 1
+    ? `M ${points[0].x - 40} ${height - padding} L ${points[0].x - 40} ${points[0].y} L ${points[0].x + 40} ${points[0].y} L ${points[0].x + 40} ${height - padding} Z`
+    : `${pathD} L ${points[points.length - 1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
+
+  return (
+    <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <BarChart2 className="w-4 h-4 text-emerald-400" />
+          Vulnerability Remediation Velocity (Findings per Scan)
+        </span>
+        <span className="text-[11px] text-slate-500 font-mono">Target Trend Curve</span>
+      </div>
+
+      <div className="w-full overflow-x-auto">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-44 overflow-visible">
+          <defs>
+            <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          {/* Grid lines */}
+          <line x1={padding} y1={padding} x2={width - padding} y2={padding} stroke="#1e293b" strokeDasharray="4 4" />
+          <line x1={padding} y1={height / 2} x2={width - padding} y2={height / 2} stroke="#1e293b" strokeDasharray="4 4" />
+          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#334155" />
+
+          {/* Area fill */}
+          <path d={areaD} fill="url(#trendGradient)" />
+
+          {/* Trend line */}
+          <path d={pathD} fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+          {/* Data Points */}
+          {points.map((p, i) => (
+            <g key={i} className="group cursor-pointer">
+              <circle cx={p.x} cy={p.y} r="5" fill="#10b981" stroke="#020617" strokeWidth="2" />
+              <circle cx={p.x} cy={p.y} r="8" fill="#10b981" opacity="0.3" className="group-hover:opacity-60 transition-opacity" />
+              <text x={p.x} y={p.y - 12} textAnchor="middle" fill="#e2e8f0" fontSize="10" fontWeight="bold">
+                {p.val}
+              </text>
+              <text x={p.x} y={height - 10} textAnchor="middle" fill="#64748b" fontSize="9" fontFamily="monospace">
+                #{p.scanId}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 export default function TrendView({ token }) {
-  const [targetInput, setTargetInput] = useState('https://example.com');
+  const [targetInput, setTargetInput] = useState('https://satyampandey.online');
   const [trendData, setTrendData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -92,6 +165,9 @@ export default function TrendView({ token }) {
               </div>
             </div>
           </div>
+
+          {/* Visual SVG Trend Line Chart */}
+          <TrendLineChart data={trendData.trend_history} />
 
           {/* Historical Trend Timeline Table */}
           <div className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
