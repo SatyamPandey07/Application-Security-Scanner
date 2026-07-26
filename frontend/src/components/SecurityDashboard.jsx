@@ -104,6 +104,7 @@ export default function SecurityDashboard({ scanId, token }) {
             <option value="dast">DAST (ZAP)</option>
             <option value="dependency">Dependencies</option>
             <option value="secret">Secrets</option>
+            <option value="access_control">Access Control (IDOR)</option>
           </select>
 
           <select
@@ -208,6 +209,7 @@ export default function SecurityDashboard({ scanId, token }) {
       {/* Finding Detail Modal */}
       <FindingDetailModal
         finding={selectedFinding}
+        token={token}
         onClose={() => setSelectedFinding(null)}
       />
     </div>
