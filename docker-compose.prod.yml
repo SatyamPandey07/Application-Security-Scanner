@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://sentinel:sentinel@postgres:5432/sentinel}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - ZAP_API_URL=${ZAP_API_URL:-http://zap:8080}
+      - SECRET_KEY=${SECRET_KEY:-production-secret-key-change-me}
+      - AI_VALIDATION_ENABLED=${AI_VALIDATION_ENABLED:-True}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+      - zap
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A app.core.celery_app.celery_app worker --loglevel=info -c 4
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://sentinel:sentinel@postgres:5432/sentinel}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - ZAP_API_URL=${ZAP_API_URL:-http://zap:8080}
+      - AI_VALIDATION_ENABLED=${AI_VALIDATION_ENABLED:-True}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+      - zap
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    restart: always
+    command: zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true
+    networks:
+      - default
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1536M
+
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sentinel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sentinel}
+      POSTGRES_DB: ${POSTGRES_DB:-sentinel}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  postgres_data:

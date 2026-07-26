@@ -1,10 +1,12 @@
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+import re
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status, Request
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.db.models import User, Scan, Finding
 from app.core.security import get_current_user
+from app.core.rate_limiter import check_rate_limit
 from app.schemas.scans import ScanCreate, ScanOut, FindingOut
 from app.tasks.scan_tasks import run_stub_scan_task
 from app.engine.cvss_calculator import calculate_priority_score
@@ -12,13 +14,46 @@ from app.engine.compliance_mapper import generate_compliance_report, generate_co
 
 router = APIRouter(prefix="/scans", tags=["Scans"])
 
+# Target Input Validation Regexes
+URL_REGEX = re.compile(r'^https?://[a-zA-Z0-9.\-]+(?::\d+)?(?:/.*)?$')
+SAFE_REPO_REGEX = re.compile(r'^(?:https?://|git@)[a-zA-Z0-9.\-:/_]+\.git$|^[a-zA-Z0-9._/\-]+$')
+
+
+def validate_target_input(target: str, target_type: str):
+    """
+    Validates scan target URLs and repository targets against dangerous traversal paths and invalid formats.
+    """
+    clean_target = target.strip()
+    if ".." in clean_target or ";" in clean_target or "|" in clean_target or "`" in clean_target:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Target string contains invalid shell characters or directory traversal patterns."
+        )
+
+    if target_type == "url":
+        if not URL_REGEX.match(clean_target):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid URL target format. Must be a valid HTTP or HTTPS URL (e.g., https://example.com)."
+            )
+    elif target_type == "repo":
+        if not SAFE_REPO_REGEX.match(clean_target):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid repository target format. Must be a valid Git repository URL or local repository path."
+            )
+
 
 @router.post("", response_model=ScanOut, status_code=status.HTTP_201_CREATED)
 def submit_scan(
     scan_data: ScanCreate,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    # Enforce Rate Limiting (10 requests per 60 seconds per user)
+    check_rate_limit(f"submit_scan_{current_user.id}", max_requests=10, window_seconds=60)
+
     if not scan_data.authorized:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -31,17 +66,14 @@ def submit_scan(
             detail="Invalid target_type. Must be 'url' or 'repo'."
         )
 
-    if not scan_data.target or not scan_data.target.strip():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Target URL or repository path cannot be empty."
-        )
+    clean_target = scan_data.target.strip()
+    validate_target_input(clean_target, scan_data.target_type)
 
     # 1. Log explicit authorization consent
     from app.db.models import ConsentLog
     consent = ConsentLog(
         user_id=current_user.id,
-        target=scan_data.target.strip(),
+        target=clean_target,
         target_type=scan_data.target_type,
     )
     db.add(consent)
@@ -50,7 +82,7 @@ def submit_scan(
     # 2. Create scan record
     scan = Scan(
         user_id=current_user.id,
-        target=scan_data.target.strip(),
+        target=clean_target,
         target_type=scan_data.target_type,
         status="pending",
     )
@@ -70,6 +102,46 @@ def list_user_scans(
     db: Session = Depends(get_db)
 ):
     return db.query(Scan).filter(Scan.user_id == current_user.id).order_by(Scan.started_at.desc()).all()
+
+
+@router.get("/trends")
+def get_target_scan_trends(
+    target: str = Query(..., description="Target URL or repository path to calculate historical trends for"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns historical trend analytics (findings found vs fixed over time) for repeat scans against the same target.
+    """
+    scans = (
+        db.query(Scan)
+        .filter(Scan.user_id == current_user.id, Scan.target == target.strip())
+        .order_by(Scan.started_at.asc())
+        .all()
+    )
+
+    history = []
+    for s in scans:
+        findings = db.query(Finding).filter(Finding.scan_id == s.id).all()
+        confirmed_count = sum(1 for f in findings if f.status == "confirmed")
+        critical_high_count = sum(1 for f in findings if f.severity_raw in ["CRITICAL", "HIGH", "ERROR"])
+        avg_cvss = round(sum(f.cvss_score or 5.0 for f in findings) / max(len(findings), 1), 1)
+
+        history.append({
+            "scan_id": s.id,
+            "started_at": s.started_at,
+            "status": s.status,
+            "total_findings": len(findings),
+            "confirmed_findings": confirmed_count,
+            "critical_high_findings": critical_high_count,
+            "average_cvss": avg_cvss,
+        })
+
+    return {
+        "target": target.strip(),
+        "total_scans_conducted": len(scans),
+        "trend_history": history,
+    }
 
 
 @router.get("/{scan_id}", response_model=ScanOut)

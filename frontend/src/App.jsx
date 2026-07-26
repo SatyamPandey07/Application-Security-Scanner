@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, User, LogOut, Lock, LayoutDashboard, History, PlusCircle, FileCheck2 } from 'lucide-react';
+import { ShieldCheck, User, LogOut, Lock, LayoutDashboard, History, PlusCircle, FileCheck2, TrendingUp } from 'lucide-react';
 import AuthModal from './components/AuthModal';
 import ScanLauncher from './components/ScanLauncher';
 import SecurityDashboard from './components/SecurityDashboard';
 import ScanHistory from './components/ScanHistory';
 import ComplianceSummary from './components/ComplianceSummary';
+import TrendView from './components/TrendView';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('sentinel_token'));
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('launch'); // 'launch', 'dashboard', 'history', 'compliance'
+  const [activeTab, setActiveTab] = useState('launch'); // 'launch', 'dashboard', 'compliance', 'trends', 'history'
   const [activeScanId, setActiveScanId] = useState(null);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function App() {
             <ShieldCheck className="w-8 h-8 text-emerald-400" />
             <h1 className="text-xl font-bold tracking-tight text-white">Sentinel</h1>
             <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              v0.1.0 PR12 Compliance
+              v1.0.0 Sentinel
             </span>
           </div>
 
@@ -83,6 +84,15 @@ export default function App() {
               >
                 <FileCheck2 className="w-3.5 h-3.5" />
                 <span>Compliance</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('trends')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
+                  activeTab === 'trends' ? 'bg-emerald-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>Trends</span>
               </button>
               <button
                 onClick={() => setActiveTab('history')}
@@ -149,6 +159,9 @@ export default function App() {
                 token={token}
               />
             )}
+            {activeTab === 'trends' && (
+              <TrendView token={token} />
+            )}
             {activeTab === 'history' && (
               <ScanHistory
                 token={token}
@@ -165,7 +178,7 @@ export default function App() {
               AI-Native Application Security Platform
             </h2>
             <p className="text-slate-400 max-w-2xl mb-8 text-lg">
-              Sign in to manage SAST, DAST, IDOR, dependency, and compliance audit reports.
+              AI-driven SAST, DAST, IDOR, Dependency, Secret Detection, and Automated GitHub Remediation.
             </p>
             <button
               onClick={() => setIsAuthOpen(true)}
