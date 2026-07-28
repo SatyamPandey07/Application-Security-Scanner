@@ -100,13 +100,13 @@ graph LR
 
 ---
 
-## 📸 Interface Screenshots
+## 📸 Interface Screenshots & Demo Recording
 
-### Sentinel Platform Application Landing Page
-![Sentinel E2E Test Recording](docs/assets/sentinel_e2e.webp)
+### Sentinel Application Walkthrough Demo (Recorded Session)
+![Sentinel Application Walkthrough Demo](docs/assets/sentinel_demo_walkthrough.webp)
 
-### Sentinel Authentication & Registration Modal
-![Sentinel Auth Modal](docs/assets/sentinel_auth_modal.png)
+### Sentinel Authentication & Sign In/Up Landing Modal
+![Sentinel Authentication & Sign In/Up Landing Modal](docs/assets/sentinel_auth_homepage.png)
 
 ---
 
