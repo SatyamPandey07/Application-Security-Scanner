@@ -1,4 +1,4 @@
-# Sentinel Platform — Production Deployment & Hardening Guide
+# Sentinel Platform: Production Deployment & Hardening Guide
 
 This document covers production deployment options, environment variables reference, sandbox security isolation, and self-hosting security checklists for **Sentinel**.
 

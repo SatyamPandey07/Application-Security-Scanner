@@ -1,6 +1,8 @@
-# Sentinel — AI-Native Application Security Platform
+# Sentinel: AI-Native Application Security Platform
 
-**Sentinel** is an autonomous, AI-native Application Security Scanner platform designed to eliminate false positives through correlated multi-engine security scanning, AI-powered remediation patch diffs, CVSS v3.1 prioritization, compliance mapping, and automated GitHub Pull Request creation.
+**Sentinel** is an automated application security scanning platform. It helps software developers and security teams find, evaluate, and fix security vulnerabilities in source code and web applications. 
+
+By combining multiple scanning tools (static code analysis, dynamic web application testing, secret detection, dependency auditing, and access control testing) with AI-assisted analysis, Sentinel filters out false alarms, explains security issues in simple language, and automatically generates ready-to-merge code fixes directly as GitHub Pull Requests.
 
 ---
 
@@ -38,7 +40,7 @@ graph TD
 
 ---
 
-## 🎯 Use-Case Architecture Diagram
+## 🎯 Use-Case Workflow Diagram
 
 ```mermaid
 graph LR
@@ -63,48 +65,48 @@ graph LR
 
 ---
 
-## 🌟 Comprehensive Feature Set
+## 🌟 What Sentinel Does (Core Features)
 
-1. **Multi-Engine Correlated Security Scanning**:
-   - **SAST**: Static Application Security Testing via Semgrep CLI (`p/security-audit` ruleset).
-   - **DAST**: Dynamic Application Security Testing via containerized OWASP ZAP (spider + passive scanning).
-   - **Authenticated IDOR / BOLA Engine**: Automated cross-account authorization verification using test credentials.
-   - **Dependency Audit Engine**: Manifest auditing via `pip-audit` / `npm audit` against CVE databases.
-   - **Secret Leak Detector**: Scanning for leaked API keys, tokens, and private keys via `detect-secrets` and high-entropy regex matchers.
+1. **Multi-Engine Security Scanning**:
+   - **Static Code Analysis (SAST)**: Scans source code files for known bugs, security flaws, and unsafe coding patterns using Semgrep.
+   - **Dynamic App Testing (DAST)**: Tests running web servers and endpoints for active vulnerabilities using OWASP ZAP.
+   - **Authorization & IDOR Testing**: Automatically verifies if logged-in users can access or tamper with data belonging to other accounts.
+   - **Dependency Vulnerability Auditing**: Checks project packages (`pip-audit`, `npm audit`) against official security databases (CVEs).
+   - **Secret Leak Detection**: Searches code for accidentally committed API keys, database credentials, and private tokens.
 
-2. **AI Remediation & Patch Generation Layer**:
-   - Anthropic Claude integration evaluating findings against surrounding source code context (~20 lines).
-   - Generates plain-English security explanations, step-by-step exploit scenarios, and unified git patch diff fixes.
-   - Re-labels low-confidence alerts (`confirmed` vs `low_confidence`) without deleting findings.
+2. **AI Analysis & Automated Fixes**:
+   - Uses Anthropic Claude to review security findings alongside surrounding source code context.
+   - Explains what each vulnerability means in clear, plain language and provides step-by-step exploit scenarios.
+   - Automatically generates code fixes (patch diffs) that developers can review.
+   - Filters low-confidence alerts so developers can focus on real, confirmed threats.
 
-3. **CVSS v3.1 & Weighted Priority Scoring**:
-   - Computes pure CVSS v3.1 base scores verified against official FIRST.org spec test vectors.
-   - Calculates weighted priority scores (`CVSS Base Score * AI Confidence`).
+3. **CVSS v3.1 Priority Ranking**:
+   - Calculates official standard severity scores (CVSS v3.1) for every issue.
+   - Multiplies severity by AI confidence ratings to rank the most critical bugs first.
 
-4. **Automated GitHub Pull Request Remediation**:
-   - One-click GitHub PR creation applying AI-suggested patch diffs to new branches.
-   - Content-drift validation handling target file modifications without force-pushing or corrupting repository state.
+4. **One-Click GitHub Pull Requests**:
+   - Automatically opens a new branch and Pull Request on GitHub with the AI-suggested code fix applied.
 
-5. **Compliance Mapping & CSV Export**:
-   - Maps security findings to **SOC 2**, **PCI DSS v4.0**, and **OWASP ASVS v4.0** control frameworks.
-   - Downloadable CSV compliance reports for audit readiness.
+5. **Compliance Mapping & CSV Exports**:
+   - Maps vulnerabilities directly to **SOC 2**, **PCI DSS v4.0**, and **OWASP ASVS v4.0** compliance requirements.
+   - Generates downloadable CSV compliance reports for security audits.
 
-6. **Historical Security Trend Analytics**:
-   - Tracks vulnerability counts, confirmed findings, and average CVSS ratings over time for repeat target scans.
+6. **Historical Security Tracking**:
+   - Tracks security improvements, remaining vulnerabilities, and average risk ratings over time across multiple scans.
 
-7. **Explicit Target Authorization & Consent Gate**:
-   - Mandatory authorization confirmation field requirement on scan submissions (`"authorized": true`).
-   - Logs all target consent actions into PostgreSQL `consent_log` table with user timestamps.
+7. **Safety & Explicit Authorization Gate**:
+   - Requires explicit permission confirmation (`"authorized": true`) before scanning any target.
+   - Logs all target authorization requests into a secure PostgreSQL `consent_log` table.
 
 ---
 
 ## 📸 Interface Screenshots
 
-### Sentinel Platform Application Landing Page (E2E Test Recording)
-![Sentinel E2E Test Recording](/Users/satyampandey/.gemini/antigravity-ide/brain/556ff5d1-97e9-4f89-be30-7c4a88f34490/sentinel_e2e_fixed_1785066592989.webp)
+### Sentinel Platform Application Landing Page
+![Sentinel E2E Test Recording](docs/assets/sentinel_e2e.webp)
 
 ### Sentinel Authentication & Registration Modal
-![Sentinel Auth Modal](/Users/satyampandey/.gemini/antigravity-ide/brain/556ff5d1-97e9-4f89-be30-7c4a88f34490/.system_generated/click_feedback/click_feedback_1785067098489.png)
+![Sentinel Auth Modal](docs/assets/sentinel_auth_modal.png)
 
 ---
 
@@ -168,7 +170,7 @@ npm run dev -- --host --port 3005
 
 ## 🧪 Automated Testing Suite
 
-Execute the 100% passing backend test suite covering all 29 unit test modules:
+Execute the backend test suite covering all unit test modules:
 
 ```bash
 cd backend
@@ -179,7 +181,7 @@ pytest
 
 ## 📖 Production Deployment & Hardening Documentation
 
-For complete production deployment options (Docker Compose / Cloud), environment variable references, Celery worker sandbox security isolation, and self-hosting security checklists, see [DEPLOYMENT.md](file:///Users/satyampandey/Application-Security-Scanner/DEPLOYMENT.md).
+For production deployment options (Docker Compose / Cloud), environment variable references, Celery worker sandbox security isolation, and self-hosting security checklists, see [DEPLOYMENT.md](file:///Users/satyampandey/Application-Security-Scanner/DEPLOYMENT.md).
 
 ---
 
