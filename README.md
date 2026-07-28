@@ -103,7 +103,7 @@ graph LR
 ## 📸 Interface Screenshots & Demo Recording
 
 ### Sentinel Application Walkthrough Demo (Recorded Session)
-![Sentinel Application Walkthrough Demo](docs/assets/sentinel_demo_walkthrough.webp)
+<video src="docs/assets/sentinel_demo_walkthrough.webm" controls="controls" muted="muted" width="100%"></video>
 
 ### Sentinel Authentication & Sign In/Up Landing Modal
 ![Sentinel Authentication & Sign In/Up Landing Modal](docs/assets/sentinel_auth_homepage.png)
