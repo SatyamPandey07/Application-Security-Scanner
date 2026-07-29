@@ -4,6 +4,7 @@
 
 By combining multiple scanning tools (static code analysis, dynamic web application testing, secret detection, dependency auditing, and access control testing) with AI-assisted analysis, Sentinel filters out false alarms, explains security issues in simple language, and automatically generates ready-to-merge code fixes directly as GitHub Pull Requests.
 
+Live URL- https://sentinel-application.netlify.app/
 ---
 
 ## 🏛️ System Architecture Diagram
