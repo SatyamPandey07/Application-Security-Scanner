@@ -6,7 +6,7 @@ By combining multiple scanning tools (static code analysis, dynamic web applicat
 
 Live URL- https://sentinel-application.netlify.app/
 
-Sentinel's core functionality, architecture decisions, and target user personas are outlined in detail within the official Product Requirements Document (PRD). This document breaks down the specific security problems the platform aims to solve, how it uses AI to filter noise, and the project's overall scope. [👉 Click here to view the full Sentinel PRD (PDF)](docs/Sentinel_PRD.pdf)
+Sentinel's core functionality, architecture decisions, and target user personas are outlined in detail within the official Product Requirements Document (PRD). This document breaks down the specific security problems the platform aims to solve, how it uses AI to filter noise, and the project's overall scope. [👉 Click here to view the full Sentinel PRD (PDF)](https://github.com/SatyamPandey07/Application-Security-Scanner/blob/main/docs/Sentinel_PRD.pdf)
 ---
 
 ## 🏛️ System Architecture Diagram
