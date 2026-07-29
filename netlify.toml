@@ -3,6 +3,9 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  VITE_API_URL = "http://34.45.59.50:8000"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
